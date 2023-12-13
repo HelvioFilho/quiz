@@ -1,5 +1,7 @@
 import { Text, TouchableOpacity, View } from "react-native";
 import { IconProps } from "phosphor-react-native";
+import { COLORS } from "@/constants/colors";
+
 type HeaderProps = {
   title: string;
   subtitle: string;
@@ -19,7 +21,7 @@ export function Header({ title, subtitle, onPress, icon: Icon }: HeaderProps) {
         activeOpacity={0.8}
         onPress={onPress}
       >
-        <Icon size={28} color="#E1E1E6" />
+        <Icon size={28} color={COLORS.grey[100]} />
       </TouchableOpacity>
     </View>
   );

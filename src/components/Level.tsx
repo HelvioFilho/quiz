@@ -4,11 +4,12 @@ import {
   TouchableOpacityProps,
   View,
 } from "react-native";
+import { COLORS } from "@/constants/colors";
 
 const TYPE_COLORS = {
-  EASY: "#00B37E",
-  HARD: "#F75A68",
-  MEDIUM: "#FBA94C",
+  EASY: COLORS.brand.light,
+  HARD: COLORS.danger,
+  MEDIUM: COLORS.warning,
 };
 
 type LevelProps = TouchableOpacityProps & {
@@ -37,7 +38,7 @@ export function Level({
         <Text
           className="uppercase text-xs font-regular"
           style={{
-            color: isChecked ? "#E1E1E6" : COLOR,
+            color: isChecked ? COLORS.grey[100] : COLOR,
           }}
         >
           {title}
