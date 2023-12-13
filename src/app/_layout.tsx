@@ -12,6 +12,7 @@ import {
 import { SplashScreen, Stack } from "expo-router";
 import { useEffect } from "react";
 import { useColorScheme } from "react-native";
+import { Loading } from "@/components/Loading";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -48,7 +49,7 @@ export default function RootLayout() {
   }, [loaded]);
 
   if (!loaded) {
-    return null;
+    return <Loading size="large" />;
   }
 
   return <RootLayoutNav />;
