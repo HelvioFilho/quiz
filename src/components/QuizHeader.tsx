@@ -17,7 +17,7 @@ export function QuizHeader({
       <Text className="font-bold text-base text-grey-100">{title}</Text>
       <View className="w-full flex-row justify-between items-center mb-2 mt-10">
         <Text className="text-grey-200">Questão {currentQuestion}</Text>
-        <Text>
+        <Text className="text-grey-200">
           {currentQuestion}/{totalOfQuestions}
         </Text>
       </View>
