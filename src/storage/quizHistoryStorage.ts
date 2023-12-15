@@ -36,3 +36,16 @@ export async function historyAdd(newHistory: HistoryProps) {
     throw error;
   }
 }
+
+export async function historyRemove(id: string) {
+  try {
+    const storage = await historyGetAll();
+
+    const filtered = storage.filter((history) => history.id !== id);
+    const histories = JSON.stringify(filtered);
+
+    await AsyncStorage.setItem(HISTORY_COLLECTION, histories);
+  } catch (error) {
+    throw error;
+  }
+}
