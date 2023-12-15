@@ -1,10 +1,15 @@
-import {
-  Text,
-  TouchableOpacity,
-  TouchableOpacityProps,
-  View,
-} from "react-native";
+import { Text, Pressable, PressableProps } from "react-native";
+import Animated, {
+  Easing,
+  interpolateColor,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  withTiming,
+} from "react-native-reanimated";
+
 import { COLORS } from "@/constants/colors";
+import { useEffect } from "react";
 
 const TYPE_COLORS = {
   EASY: COLORS.brand.light,
@@ -12,7 +17,7 @@ const TYPE_COLORS = {
   MEDIUM: COLORS.warning,
 };
 
-type LevelProps = TouchableOpacityProps & {
+type LevelProps = PressableProps & {
   title: string;
   isChecked?: boolean;
   type?: keyof typeof TYPE_COLORS;
@@ -24,26 +29,58 @@ export function Level({
   isChecked = false,
   ...rest
 }: LevelProps) {
+  const scale = useSharedValue(1);
+  const checked = useSharedValue(1);
+
   const COLOR = TYPE_COLORS[type];
 
+  const animatedContainerStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ scale: scale.value }],
+      backgroundColor: interpolateColor(
+        checked.value,
+        [0, 1],
+        ["transparent", COLOR]
+      ),
+    };
+  });
+
+  const animatedTextStyle = useAnimatedStyle(() => {
+    return {
+      color: interpolateColor(checked.value, [0, 1], [COLOR, COLORS.grey[100]]),
+    };
+  });
+
+  function onPressIn() {
+    scale.value = withTiming(1.2, { easing: Easing.bounce });
+  }
+
+  function onPressOut() {
+    scale.value = 1;
+  }
+
+  useEffect(() => {
+    checked.value = withTiming(isChecked ? 1 : 0, { duration: 500 });
+  }, [isChecked]);
+
   return (
-    <TouchableOpacity {...rest}>
-      <View
+    <Pressable onPressIn={onPressIn} onPressOut={onPressOut} {...rest}>
+      <Animated.View
         className="w-20 h-9 rounded border items-center justify-center m-1.5"
-        style={{
-          borderColor: COLOR,
-          backgroundColor: isChecked ? COLOR : "transparent",
-        }}
+        style={[
+          animatedContainerStyle,
+          {
+            borderColor: COLOR,
+          },
+        ]}
       >
-        <Text
+        <Animated.Text
           className="uppercase text-xs font-regular"
-          style={{
-            color: isChecked ? COLORS.grey[100] : COLOR,
-          }}
+          style={animatedTextStyle}
         >
           {title}
-        </Text>
-      </View>
-    </TouchableOpacity>
+        </Animated.Text>
+      </Animated.View>
+    </Pressable>
   );
 }
