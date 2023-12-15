@@ -19,8 +19,9 @@ export default function Home() {
     const levelAlreadySelected = levels.includes(level);
 
     if (levelAlreadySelected) {
-      if (levels.length > 1)
-        setLevels((prevState) => prevState.filter((level) => level !== level));
+      if (levels.length > 1) {
+        setLevels((prevState) => prevState.filter((item) => item !== level));
+      }
     } else {
       setLevels((prevState) => [...prevState, level]);
     }
