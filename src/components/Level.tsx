@@ -1,10 +1,9 @@
-import { Text, Pressable, PressableProps } from "react-native";
+import { Pressable, PressableProps } from "react-native";
 import Animated, {
   Easing,
   interpolateColor,
   useAnimatedStyle,
   useSharedValue,
-  withSpring,
   withTiming,
 } from "react-native-reanimated";
 
@@ -22,6 +21,8 @@ type LevelProps = PressableProps & {
   isChecked?: boolean;
   type?: keyof typeof TYPE_COLORS;
 };
+
+const PressableAnimated = Animated.createAnimatedComponent(Pressable);
 
 export function Level({
   title,
@@ -64,23 +65,24 @@ export function Level({
   }, [isChecked]);
 
   return (
-    <Pressable onPressIn={onPressIn} onPressOut={onPressOut} {...rest}>
-      <Animated.View
-        className="w-20 h-9 rounded border items-center justify-center m-1.5"
-        style={[
-          animatedContainerStyle,
-          {
-            borderColor: COLOR,
-          },
-        ]}
+    <PressableAnimated
+      className="w-20 h-9 rounded border items-center justify-center m-1.5"
+      style={[
+        animatedContainerStyle,
+        {
+          borderColor: COLOR,
+        },
+      ]}
+      onPressIn={onPressIn}
+      onPressOut={onPressOut}
+      {...rest}
+    >
+      <Animated.Text
+        className="uppercase text-xs font-regular"
+        style={animatedTextStyle}
       >
-        <Animated.Text
-          className="uppercase text-xs font-regular"
-          style={animatedTextStyle}
-        >
-          {title}
-        </Animated.Text>
-      </Animated.View>
-    </Pressable>
+        {title}
+      </Animated.Text>
+    </PressableAnimated>
   );
 }
