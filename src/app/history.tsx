@@ -91,13 +91,25 @@ export default function history() {
                 }
               }}
               overshootRight={false}
+              rightThreshold={10}
+              renderLeftActions={() => null}
+              onSwipeableOpen={
+                () =>
+                  handleRemove(
+                    item.id,
+                    index
+                  ) /* removes the item without pressing the button */
+              }
               renderRightActions={() => (
-                <Pressable
-                  className="w-24 h-24 flex-row rounded-r-md items-center justify-center bg-danger"
-                  onPress={() => handleRemove(item.id, index)}
-                >
+                // <Pressable
+                //   className="w-24 h-24 flex-row rounded-r-md items-center justify-center bg-danger"
+                //   onPress={() => handleRemove(item.id, index)}
+                // >
+                //   <Trash size={32} color={COLORS.grey[100]} />
+                // </Pressable>
+                <View className="w-24 h-24 flex-row rounded-r-md items-center justify-center bg-danger">
                   <Trash size={32} color={COLORS.grey[100]} />
-                </Pressable>
+                </View>
               )}
             >
               <HistoryCard data={item} />
