@@ -1,5 +1,6 @@
 import { Dimensions, Text, View } from "react-native";
 import { Option } from "./Option";
+import Animated, { Keyframe } from "react-native-reanimated";
 
 type QuestionProps = {
   title: string;
@@ -19,10 +20,38 @@ export function Question({
 }: QuestionComponentProps) {
   const { width } = Dimensions.get("window");
   const MARGIN_HORIZONTAL = 24 * 2;
+
+  const enteringKeyframe = new Keyframe({
+    0: {
+      opacity: 0,
+      transform: [{ translateX: width }, { rotate: "90deg" }],
+    },
+    70: {
+      opacity: 0.3,
+    },
+    100: {
+      opacity: 1,
+      transform: [{ translateX: 0 }, { rotate: "0deg" }],
+    },
+  });
+
+  const exitingKeyframe = new Keyframe({
+    from: {
+      opacity: 1,
+      transform: [{ translateX: 0 }, { rotate: "0deg" }],
+    },
+    to: {
+      opacity: 0,
+      transform: [{ translateX: width * -1 }, { rotate: "-90deg" }],
+    },
+  });
+
   return (
-    <View
+    <Animated.View
       className="bg-grey-700 rounded-xl p-5"
       style={{ width: width - MARGIN_HORIZONTAL }}
+      entering={enteringKeyframe}
+      exiting={exitingKeyframe}
     >
       <Text className="font-bold text-lg text-white text-center mb-4">
         {question.title}
@@ -37,6 +66,6 @@ export function Question({
           }
         />
       ))}
-    </View>
+    </Animated.View>
   );
 }
