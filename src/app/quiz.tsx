@@ -164,7 +164,12 @@ export default function quiz() {
     };
   });
 
+  const onLongPress = Gesture.LongPress()
+    .minDuration(200)
+    .onStart(() => {});
+
   const onPan = Gesture.Pan()
+    .activateAfterLongPress(200)
     .onUpdate((event) => {
       const moveToLeft = event.translationX < 0;
       if (moveToLeft) cardPosition.value = event.translationX;
