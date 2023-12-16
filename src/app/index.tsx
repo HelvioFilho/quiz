@@ -63,8 +63,9 @@ export default function Home() {
       <FlatList
         data={quizzes}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
+        renderItem={({ item, index }) => (
           <QuizCard
+            index={index}
             data={item}
             onPress={() =>
               navigation.push({
