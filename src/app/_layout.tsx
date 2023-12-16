@@ -1,18 +1,17 @@
+import "react-native-gesture-handler";
+
+import { useEffect } from "react";
+import { StatusBar } from "react-native";
+import { SplashScreen, Stack } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import {
   useFonts,
   Roboto_400Regular,
   Roboto_700Bold,
 } from "@expo-google-fonts/roboto";
-import { SplashScreen, Stack } from "expo-router";
-import { useEffect } from "react";
-import { StatusBar } from "react-native";
-import { Loading } from "@/components/Loading";
-import { SafeAreaView } from "react-native-safe-area-context";
 
-export {
-  // Catch any errors thrown by the Layout component.
-  ErrorBoundary,
-} from "expo-router";
+import { Loading } from "@/components/Loading";
 
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
@@ -48,17 +47,19 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   return (
-    <SafeAreaView className="flex-1 bg-grey-800">
-      <StatusBar
-        barStyle="light-content"
-        backgroundColor="transparent"
-        translucent
-      />
-      <Stack
-        screenOptions={{
-          headerShown: false,
-        }}
-      />
-    </SafeAreaView>
+    <GestureHandlerRootView className="flex-1">
+      <SafeAreaView className="flex-1 bg-grey-800">
+        <StatusBar
+          barStyle="light-content"
+          backgroundColor="transparent"
+          translucent
+        />
+        <Stack
+          screenOptions={{
+            headerShown: false,
+          }}
+        />
+      </SafeAreaView>
+    </GestureHandlerRootView>
   );
 }
