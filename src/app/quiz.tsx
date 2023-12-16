@@ -1,13 +1,23 @@
-import { ConfirmButton } from "@/components/ConfirmButton";
+import { useEffect, useState } from "react";
+import { Alert, ScrollView, View } from "react-native";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import Animated, {
+  Easing,
+  interpolate,
+  useAnimatedStyle,
+  useSharedValue,
+  withSequence,
+  withTiming,
+} from "react-native-reanimated";
+
 import { Loading } from "@/components/Loading";
-import { OutlineButton } from "@/components/OutlineButton";
 import { Question } from "@/components/Question";
 import { QuizHeader } from "@/components/QuizHeader";
+import { ConfirmButton } from "@/components/ConfirmButton";
+import { OutlineButton } from "@/components/OutlineButton";
+
 import { QUIZ } from "@/data/quiz";
 import { historyAdd } from "@/storage/quizHistoryStorage";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { useEffect, useState } from "react";
-import { Alert, ScrollView, Text, View } from "react-native";
 
 type QuizParams = {
   id: string;
@@ -24,9 +34,25 @@ export default function quiz() {
     null
   );
 
+  const shake = useSharedValue(0);
+
   const navigation = useRouter();
 
   const { id } = useLocalSearchParams() as QuizParams;
+
+  const shakeStyleAnimated = useAnimatedStyle(() => {
+    return {
+      transform: [
+        {
+          translateX: interpolate(
+            shake.value,
+            [0, 0.5, 1, 1.5, 2, 2.5, 3],
+            [0, -15, 0, 15, 0, -15, 0]
+          ),
+        },
+      ],
+    };
+  });
 
   async function handleFinished() {
     await historyAdd({
@@ -68,9 +94,12 @@ export default function quiz() {
 
     if (quiz.questions[currentQuestion].correct === alternativeSelected) {
       setPoints((prevState) => prevState + 1);
+    } else {
+      shakeAnimation();
     }
 
     setAlternativeSelected(null);
+    handleNextQuestion();
   }
 
   function handleStop() {
@@ -89,17 +118,18 @@ export default function quiz() {
     return true;
   }
 
+  function shakeAnimation() {
+    shake.value = withSequence(
+      withTiming(3, { duration: 400, easing: Easing.bounce }),
+      withTiming(0)
+    );
+  }
+
   useEffect(() => {
     const quizSelected = QUIZ.filter((item) => item.id === id)[0];
     setQuiz(quizSelected);
     setIsLoading(false);
   }, []);
-
-  useEffect(() => {
-    if (quiz.questions) {
-      handleNextQuestion();
-    }
-  }, [points]);
 
   if (isLoading) {
     return <Loading size="large" />;
@@ -121,12 +151,14 @@ export default function quiz() {
           currentQuestion={currentQuestion + 1}
           totalOfQuestions={quiz.questions.length}
         />
-        <Question
-          key={quiz.questions[currentQuestion].title}
-          question={quiz.questions[currentQuestion]}
-          alternativeSelected={alternativeSelected}
-          setAlternativeSelected={setAlternativeSelected}
-        />
+        <Animated.View style={shakeStyleAnimated}>
+          <Question
+            key={quiz.questions[currentQuestion].title}
+            question={quiz.questions[currentQuestion]}
+            alternativeSelected={alternativeSelected}
+            setAlternativeSelected={setAlternativeSelected}
+          />
+        </Animated.View>
         <View className="flex-row mt-6">
           <OutlineButton title="Parar" onPress={handleStop} />
           <ConfirmButton onPress={handleConfirm} />
