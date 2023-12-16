@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
-import { Alert, ScrollView, View } from "react-native";
+import { Alert, Text, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import Animated, {
   Easing,
+  Extrapolate,
   interpolate,
+  useAnimatedScrollHandler,
   useAnimatedStyle,
   useSharedValue,
   withSequence,
@@ -18,6 +20,8 @@ import { OutlineButton } from "@/components/OutlineButton";
 
 import { QUIZ } from "@/data/quiz";
 import { historyAdd } from "@/storage/quizHistoryStorage";
+import { ProgressBar } from "@/components/ProgressBar";
+import { COLORS } from "@/constants/colors";
 
 type QuizParams = {
   id: string;
@@ -35,6 +39,7 @@ export default function quiz() {
   );
 
   const shake = useSharedValue(0);
+  const scrollY = useSharedValue(0);
 
   const navigation = useRouter();
 
@@ -125,6 +130,34 @@ export default function quiz() {
     );
   }
 
+  const scrollHandler = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      scrollY.value = event.contentOffset.y;
+    },
+  });
+
+  const fixedProgressBarStyles = useAnimatedStyle(() => {
+    return {
+      position: "absolute",
+      paddingTop: 40,
+      backgroundColor: COLORS.grey[500],
+      width: "110%",
+      left: "-5%",
+      zIndex: 50,
+      opacity: interpolate(scrollY.value, [85, 95], [0, 1], Extrapolate.CLAMP),
+      transform: [
+        {
+          translateY: interpolate(
+            scrollY.value,
+            [90, 100],
+            [-40, 0],
+            Extrapolate.CLAMP
+          ),
+        },
+      ],
+    };
+  });
+
   useEffect(() => {
     const quizSelected = QUIZ.filter((item) => item.id === id)[0];
     setQuiz(quizSelected);
@@ -137,7 +170,16 @@ export default function quiz() {
 
   return (
     <View className="flex-1 bg-grey-800">
-      <ScrollView
+      <Animated.View style={fixedProgressBarStyles}>
+        <Text className="font-bold text-base text-grey-100 text-center mb-4">
+          {quiz.title}
+        </Text>
+        <ProgressBar
+          total={quiz.questions.length}
+          current={currentQuestion + 1}
+        />
+      </Animated.View>
+      <Animated.ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           alignItems: "center",
@@ -145,6 +187,8 @@ export default function quiz() {
           paddingBottom: 300,
           padding: 32,
         }}
+        onScroll={scrollHandler}
+        scrollEventThrottle={16}
       >
         <QuizHeader
           title={quiz.title}
@@ -163,7 +207,7 @@ export default function quiz() {
           <OutlineButton title="Parar" onPress={handleStop} />
           <ConfirmButton onPress={handleConfirm} />
         </View>
-      </ScrollView>
+      </Animated.ScrollView>
     </View>
   );
 }
