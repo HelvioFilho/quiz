@@ -74,7 +74,7 @@ export default function history() {
         onPress={() => navigation.back()}
       />
       <ScrollView
-        contentContainerStyle={{ padding: 32 }}
+        contentContainerStyle={{ flexGrow: 1, padding: 32 }}
         showsVerticalScrollIndicator={false}
       >
         {history.map((item, index) => (
