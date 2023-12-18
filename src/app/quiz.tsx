@@ -14,6 +14,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { Audio } from "expo-av";
+import * as Haptics from "expo-haptics";
 
 import { Loading } from "@/components/Loading";
 import { Question } from "@/components/Question";
@@ -150,7 +151,8 @@ export default function quiz() {
     return true;
   }
 
-  function shakeAnimation() {
+  async function shakeAnimation() {
+    await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     shake.value = withSequence(
       withTiming(3, { duration: 400, easing: Easing.bounce }),
       withTiming(0, undefined, (finished) => {
