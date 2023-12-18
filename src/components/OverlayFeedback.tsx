@@ -22,7 +22,6 @@ export function OverlayFeedback({ status }: OverlayFeedbackProps) {
   const color = STATUS[status];
 
   const { height, width } = useWindowDimensions();
-
   const styleAnimated = useAnimatedStyle(() => {
     return {
       opacity: opacity.value,
@@ -38,18 +37,11 @@ export function OverlayFeedback({ status }: OverlayFeedbackProps) {
 
   return (
     <Animated.View
-      style={[
-        styleAnimated,
-        {
-          position: "absolute",
-          with: width,
-          height: height,
-        },
-      ]}
+      style={[{ width, height, position: "absolute" }, styleAnimated]}
     >
-      <Canvas className="flex-1">
+      <Canvas style={{ flex: 1 }}>
         <Rect x={0} y={0} width={width} height={height} color={color}>
-          <BlurMask blur={50} style={"inner"} />
+          <BlurMask blur={50} style="inner" />
         </Rect>
       </Canvas>
     </Animated.View>
