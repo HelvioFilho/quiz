@@ -58,7 +58,10 @@ function RootLayoutNav() {
           screenOptions={{
             headerShown: false,
           }}
-        />
+        >
+          <Stack.Screen name="quiz" options={{ gestureEnabled: false }} />
+          <Stack.Screen name="finish" options={{ gestureEnabled: false }} />
+        </Stack>
       </SafeAreaView>
     </GestureHandlerRootView>
   );
