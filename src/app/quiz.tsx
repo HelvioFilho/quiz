@@ -13,6 +13,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import { Audio } from "expo-av";
 
 import { Loading } from "@/components/Loading";
 import { Question } from "@/components/Question";
@@ -20,12 +21,14 @@ import { QuizHeader } from "@/components/QuizHeader";
 import { ProgressBar } from "@/components/ProgressBar";
 import { ConfirmButton } from "@/components/ConfirmButton";
 import { OutlineButton } from "@/components/OutlineButton";
+import { OverlayFeedback } from "@/components/OverlayFeedback";
 
 import { QUIZ } from "@/data/quiz";
 import { historyAdd } from "@/storage/quizHistoryStorage";
 import { COLORS } from "@/constants/colors";
-import { OverlayFeedback } from "@/components/OverlayFeedback";
-import finish from "./finish";
+
+const correct = require("@/assets/correct.mp3");
+const wrong = require("@/assets/wrong.mp3");
 
 type QuizParams = {
   id: string;
@@ -68,6 +71,19 @@ export default function quiz() {
     };
   });
 
+  async function playSound(isCorrect: boolean) {
+    try {
+      const file = isCorrect ? correct : wrong;
+      const { sound } = await Audio.Sound.createAsync(file, {
+        shouldPlay: true,
+      });
+      await sound.setPositionAsync(0);
+      await sound.playAsync();
+    } catch (error) {
+      console.log("error");
+    }
+  }
+
   async function handleFinished() {
     await historyAdd({
       id: new Date().getTime().toString(),
@@ -76,7 +92,6 @@ export default function quiz() {
       points,
       questions: quiz.questions.length,
     });
-
     navigation.push({
       pathname: "/finish",
       params: {
@@ -107,10 +122,11 @@ export default function quiz() {
     }
 
     if (quiz.questions[currentQuestion].correct === alternativeSelected) {
+      await playSound(true);
       setStatusReply(1);
       setPoints((prevState) => prevState + 1);
-      handleNextQuestion();
     } else {
+      await playSound(false);
       setStatusReply(2);
       shakeAnimation();
     }
@@ -202,6 +218,12 @@ export default function quiz() {
     setQuiz(quizSelected);
     setIsLoading(false);
   }, []);
+
+  useEffect(() => {
+    if (points > 0) {
+      handleNextQuestion();
+    }
+  }, [points]);
 
   if (isLoading) {
     return <Loading size="large" />;
