@@ -1,6 +1,6 @@
 import { Dimensions, Text, View } from "react-native";
 import { Option } from "./Option";
-import Animated, { Keyframe } from "react-native-reanimated";
+import Animated, { Keyframe, runOnJS } from "react-native-reanimated";
 
 type QuestionProps = {
   title: string;
@@ -9,12 +9,14 @@ type QuestionProps = {
 
 type QuestionComponentProps = {
   question: QuestionProps;
+  onUnmount: () => void;
   alternativeSelected?: number | null;
   setAlternativeSelected?: (value: number) => void;
 };
 
 export function Question({
   question,
+  onUnmount,
   alternativeSelected,
   setAlternativeSelected,
 }: QuestionComponentProps) {
@@ -51,7 +53,12 @@ export function Question({
       className="bg-grey-700 rounded-xl p-5"
       style={{ width: width - MARGIN_HORIZONTAL }}
       entering={enteringKeyframe}
-      exiting={exitingKeyframe}
+      exiting={exitingKeyframe.withCallback((finished) => {
+        "worklet";
+        if (finished) {
+          runOnJS(onUnmount)();
+        }
+      })}
     >
       <Text className="font-bold text-lg text-white text-center mb-4">
         {question.title}

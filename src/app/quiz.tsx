@@ -24,6 +24,8 @@ import { OutlineButton } from "@/components/OutlineButton";
 import { QUIZ } from "@/data/quiz";
 import { historyAdd } from "@/storage/quizHistoryStorage";
 import { COLORS } from "@/constants/colors";
+import { OverlayFeedback } from "@/components/OverlayFeedback";
+import finish from "./finish";
 
 type QuizParams = {
   id: string;
@@ -42,6 +44,7 @@ export default function quiz() {
   const [alternativeSelected, setAlternativeSelected] = useState<null | number>(
     null
   );
+  const [statusReply, setStatusReply] = useState(0);
 
   const shake = useSharedValue(0);
   const scrollY = useSharedValue(0);
@@ -104,13 +107,15 @@ export default function quiz() {
     }
 
     if (quiz.questions[currentQuestion].correct === alternativeSelected) {
+      setStatusReply(1);
       setPoints((prevState) => prevState + 1);
+      handleNextQuestion();
     } else {
+      setStatusReply(2);
       shakeAnimation();
     }
 
     setAlternativeSelected(null);
-    handleNextQuestion();
   }
 
   function handleStop() {
@@ -132,7 +137,12 @@ export default function quiz() {
   function shakeAnimation() {
     shake.value = withSequence(
       withTiming(3, { duration: 400, easing: Easing.bounce }),
-      withTiming(0)
+      withTiming(0, undefined, (finished) => {
+        "worklet";
+        if (finished) {
+          runOnJS(handleNextQuestion)();
+        }
+      })
     );
   }
 
@@ -163,10 +173,6 @@ export default function quiz() {
       ],
     };
   });
-
-  const onLongPress = Gesture.LongPress()
-    .minDuration(200)
-    .onStart(() => {});
 
   const onPan = Gesture.Pan()
     .activateAfterLongPress(200)
@@ -203,6 +209,7 @@ export default function quiz() {
 
   return (
     <View className="flex-1 bg-grey-800">
+      <OverlayFeedback status={statusReply} />
       <Animated.View style={fixedProgressBarStyles}>
         <Text className="font-bold text-base text-grey-100 text-center mb-4">
           {quiz.title}
@@ -232,6 +239,7 @@ export default function quiz() {
           <Animated.View style={[shakeStyleAnimated, dragStyles]}>
             <Question
               key={quiz.questions[currentQuestion].title}
+              onUnmount={() => setStatusReply(0)}
               question={quiz.questions[currentQuestion]}
               alternativeSelected={alternativeSelected}
               setAlternativeSelected={setAlternativeSelected}
