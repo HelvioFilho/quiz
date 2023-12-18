@@ -13,6 +13,11 @@ export const COLORS = {
     light: "#00B37E",
     mid: "#00875F",
   },
+  star: {
+    blue: "#57B6E5",
+    green: "#00B37E",
+    gray: "#6F6F6F",
+  },
   warning: "#FBA94C",
   danger: "#F75A68",
   label: "#A6A1B2",
